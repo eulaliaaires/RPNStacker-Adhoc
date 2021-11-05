@@ -1,7 +1,6 @@
 
 import java.util.Scanner;
 import java.util.Stack;
-import java.io.BufferedReader;
 
 public class RPNStackerCalculator {
 	
@@ -33,7 +32,7 @@ public class RPNStackerCalculator {
         }
     }
 
-    // check if current input is a integer
+    // check if current input is an integer
     
     public static boolean isInteger(String input) {
         if (input == null) return false;
@@ -46,7 +45,7 @@ public class RPNStackerCalculator {
         return true;
     }
     
-    // check if current input is a operator
+    // check if current input is an operator
 
     public static boolean isOperation(String input) {
         if (input == null) return false;
