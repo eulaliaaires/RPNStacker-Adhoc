@@ -58,10 +58,10 @@ public class RPNStackerCalculator {
 	private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Digite a operação a ser feita: ");
+        System.out.println("Digite a operaÃ§Ã£o a ser feita (para finalizar digite end): ");
 
         String input = "";
-        while (scanner.hasNext()) {
+        while (input != "end") {
             input = scanner.next();
 
             if (isInteger(input)) {
