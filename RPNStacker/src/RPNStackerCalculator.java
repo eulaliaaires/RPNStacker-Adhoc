@@ -2,6 +2,7 @@
 import java.util.Scanner;
 import java.util.Stack;
 
+
 public class RPNStackerCalculator {
 	
 	private static Stack<Integer> stack = new Stack<>();
@@ -65,13 +66,37 @@ public class RPNStackerCalculator {
 
             if (isInteger(input)) {
                 stack.push(Integer.parseInt(input));
+                System.out.println(new Token (TokenType.NUM, input));
             } else if (isOperation(input)) {
                 int current = parseOperation(input, stack);
+                TokenType tokenType = TokenType.EOF;
+                switch (input) {
+	                case "+": 
+                    tokenType =  TokenType.PLUS;
+	                	break;
+	                case "-": 
+                    tokenType =  TokenType.MINUS;
+	                	break;
+	                case "*": 
+                    tokenType =  TokenType.STAR;
+	                	break;
+	                case "/": 
+                    tokenType =  TokenType.SLASH;
+	                	break;
+	                default: 
+                    tokenType = TokenType.EOF;
+	                	break;
+                }
+                System.out.print(new Token (tokenType, input));
                 if (stack.size() == 0) {
+                	System.out.println();
                     System.out.println("= " + current);
                 } 
                
                 stack.push(current);
+            }
+            else {
+            	System.out.print("Error: Unexpected character: " + input);
             }
         }
     }
