@@ -5,24 +5,55 @@ import java.util.Stack;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class RPNStacker {
 
-    private static Stack<Integer> stack = new Stack<>();
+    private static Stack<String> stack = new Stack<>();
+    private static Boolean debugging = true;
 
-    public static int parseOperation(String operation, Stack<Integer> stack) throws Exception {
-        int result = (stack.empty()) ? 0 : stack.pop();
+    public static String parseOperation(String operation, Stack<String> stack, Map<String,String> hashTable) throws Exception {
+        String result = (stack.empty()) ? "0" : stack.pop();
 
         if (!stack.empty()) {
-            result = calculate(operation, stack.pop(), result);
+            result = Integer.toString(calculate(operation, stack.pop(), result, hashTable)) ;
         }
 
         return result;
     }
 
-    public static int calculate(String operation, int leftOperator, int rightOperator) throws Exception {
+    public static int calculate(String operation, String leftOperator, String rightOperator, Map<String,String> hashTable) throws Exception {
     	 
-    	System.out.println(new Token(TokenType.NUM, Integer.toString(leftOperator)));
-    	System.out.println(new Token(TokenType.NUM, Integer.toString(rightOperator)));
+    	
+    	TokenType leftOperatorTokenType = TokenType.EOF;
+    	TokenType rightOperatorTokenType = TokenType.EOF;
+    	
+    	int leftOperatorValue = 0;
+    	int rightOperatorValue = 0;
+    	
+    	if(isId(leftOperator)) {
+    		leftOperatorTokenType = TokenType.ID;
+    		leftOperatorValue = mapHash(hashTable, leftOperator);
+    	}
+    	else {
+    		leftOperatorTokenType = TokenType.NUM;
+    		leftOperatorValue = Integer.parseInt(leftOperator);
+    	}
+    	
+    	if(isId(rightOperator)) {
+    		rightOperatorTokenType = TokenType.ID;
+    		rightOperatorValue = mapHash(hashTable, rightOperator);
+    	}
+    	else {
+    		rightOperatorTokenType = TokenType.NUM;
+    		rightOperatorValue = Integer.parseInt(rightOperator);
+    	}
+    	
+    	if(debugging) {
+    		System.out.println(new Token(leftOperatorTokenType, leftOperator));
+    		System.out.println(new Token(rightOperatorTokenType, rightOperator));
+    	}
     	
     	TokenType tokenType = TokenType.EOF;
     	int value = 0;
@@ -30,29 +61,31 @@ public class RPNStacker {
     	switch (operation) {
         case "+":
         	tokenType = TokenType.PLUS;
-            value = leftOperator + rightOperator;
+            value = leftOperatorValue + rightOperatorValue;
             break;
         case "-":
         	tokenType = TokenType.MINUS;
-        	value = leftOperator - rightOperator;
+        	value = leftOperatorValue - rightOperatorValue;
             break;
         case "*":
         	tokenType = TokenType.STAR;
-        	value = leftOperator * rightOperator;
+        	value = leftOperatorValue * rightOperatorValue;
             break;
         case "/": {
         	tokenType = TokenType.SLASH;
-        	value = leftOperator / rightOperator;
-        	if (rightOperator == 0) {
+        	value = leftOperatorValue / rightOperatorValue;
+        	if (rightOperatorValue == 0) {
         		throw new Exception("Cannot divide by 0");
         	}
             break;
         }
         default:
-            value = leftOperator;
+            value = leftOperatorValue;
         }
     	
-    	 System.out.print(new Token(tokenType, operation));
+    	if(debugging) {
+    		System.out.println(new Token(tokenType, operation));
+    	}
     	
     	return value;
     }
@@ -79,8 +112,27 @@ public class RPNStacker {
 
         return input.equals("+") || input.equals("-") || input.equals("*") || input.equals("/");
     }
+    
+    public static boolean isId(String input) {
+        if (input == null)
+            return false;
+
+        return Character.isLetter(input.charAt(0));
+    }
+    
+    public static int mapHash (Map<String,String> hashTable, String key) throws Exception {
+    	 if (hashTable.containsKey(key)) {
+    		 return Integer.parseInt(hashTable.get(key)) ;
+    	 }
+    	 else {
+    		 throw new Exception(key + " cannot be resolved");
+    	 }
+    }
 
     public static void main(String[] args) throws Exception {
+    	
+    	Map<String,String> hashTable = new HashMap<String,String>();
+    	hashTable.put("y", new String("10"));
 
         String filePath = "C:/Users/eulal/Documents/Calc1.stk";
         
@@ -92,15 +144,20 @@ public class RPNStacker {
 	            String line = reader.nextLine();
 	
 	            if (isInteger(line)) {
-	                stack.push(Integer.parseInt(line));
+	                stack.push(line);
 	            } else if (isOperation(line)) {
-	                int current = parseOperation(line, stack);          
+	                String current = parseOperation(line, stack, hashTable);          
 	                if (stack.size() == 0) {
 	                    System.out.println();
 	                }
 	
 	                stack.push(current);
-	            } else {
+	            } 
+	            else if (isId(line)) {
+	            	stack.push(line);
+	            }
+	            
+	            else {
 	                System.out.println("Error: Unexpected character: " + line);
 	                throw new Exception("Character not allowed");
 	            }
