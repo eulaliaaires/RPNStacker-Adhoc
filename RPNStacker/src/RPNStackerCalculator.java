@@ -96,12 +96,7 @@ public class RPNStacker {
         if (input == null)
             return false;
 
-        try {
-            Integer.parseInt(input);
-        } catch (NumberFormatException ex) {
-            return false;
-        }
-        return true;
+        return input.matches("(\\d)+");
     }
 
     // check if current input is an operator
@@ -110,14 +105,14 @@ public class RPNStacker {
         if (input == null)
             return false;
 
-        return input.equals("+") || input.equals("-") || input.equals("*") || input.equals("/");
+        return input.matches("(\\+|-|\\*|/)");
     }
     
     public static boolean isId(String input) {
         if (input == null)
             return false;
 
-        return Character.isLetter(input.charAt(0));
+        return input.matches("([A-Za-z])");
     }
     
     public static int mapHash (Map<String,String> hashTable, String key) throws Exception {
@@ -163,7 +158,7 @@ public class RPNStacker {
 	            }
 	
 	        }
-	        System.out.println("Saída = " + stack.pop());
+	        System.out.print("Saída = " + stack.pop());
 	
 	        reader.close();
 	    } catch (FileNotFoundException e) {
